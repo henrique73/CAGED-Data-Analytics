@@ -4,7 +4,7 @@ const {MongoClient} = require('mongodb');
 
 const headersDictionary={competência: "date",região:"region",uf:"uf",município:"county",seção:"section",subclasse:"subclass",saldomovimentação:"balance",categoria:"category_code",cbo2002ocupação:"occupation_code",graudeinstrução:"education_degree",idade:"age",sexo:"gender_code",tipoempregador:"employer_type",tipoestabelecimento:"establishment_type",tipomovimentação:"movement_type",indtrabintermitente:"intermittent_worker_indicator",indtrabparcial:"part_worker_indicator",salário:"salary",horascontratuais:"contractual_hours",tipodedeficiência:"disability_code",raçacor:"color_race_code",indicadoraprendiz:"apprentice_indicator",fonte:"source"}
 const results = [];
-const uri = "mongodb+srv://admin:D8QDgP2twy2hchNY@cluster0.d7gka.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const uri = "";
 const client = new MongoClient(uri);
 
 try {
@@ -31,8 +31,6 @@ function readFiles(month){
 
         for(var i = 0; i < files.length; i++){
 
-            var result = {table:[]};
-
             input = fs.createReadStream(inputFolder + files[i]);
             console.log("Reading file" + files[i])
             fs.createReadStream("data/"+month+"/"+files[i])
@@ -40,8 +38,17 @@ function readFiles(month){
                 .on('data', (data) => {
                     if(data.movement_type == 10 || data.movement_type == 20 || data.movement_type == 25 || data.movement_type == 35 || data.movement_type == 70){
                         if(data.disability_code !=0){
+                            switch (data.disability_code){
+                                case 1: disabilityHiredPhyisical =  disabilityHiredPhyisical + 1;
+                                case 2: disabilityHiredAuditory = disabilityHiredAuditory + 1;
+                                case 3: disabilityHiredVisual = disabilityHiredVisual + 1;
+                                case 4: disabilityHiredIntellectual = disabilityHiredIntellectual + 1;
+                                case 5: disabilityHiredMultiple = disabilityHiredMultiple + 1;
+                                case 6: disabilityHiredRehabilitated = disabilityHiredRehabilitated + 1;
+                                case 9: disabilityHiredUnidentified = disabilityHiredUnidentified + 1;
+                            }
                             if(data.disability_code == 1){
-                                disabilityHiredPhyisical =  disabilityHiredPhyisical + 1;
+                                //disabilityHiredPhyisical =  disabilityHiredPhyisical + 1;
                             }
                             if(data.disability_code == 2){
                                 disabilityHiredAuditory = disabilityHiredAuditory + 1;
@@ -64,7 +71,7 @@ function readFiles(month){
                         }
                     }
                 })
-                .on('end', () => {console.log(disabilityHiredPhyisical + "|" + disabilityAuditory)});
+                .on('end', () => {console.log(disabilityHiredPhyisical)});
 
         }
     });
